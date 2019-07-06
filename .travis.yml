@@ -1,0 +1,32 @@
+language: julia
+os:
+- linux
+julia:
+- 1.0
+notifications:
+  email: false
+git:
+  depth: 99999999
+cache:
+  timeout: 1000
+  directories:
+  - downloads
+env:
+  global:
+  - BINARYBUILDER_DOWNLOADS_CACHE=downloads
+  - BINARYBUILDER_AUTOMATIC_APPLE=true
+sudo: required
+before_script:
+- julia -e 'using Pkg; pkg"add BinaryProvider"; pkg"add BinaryBuilder#master"; Pkg.build()'
+script:
+- julia build_tarballs.jl
+deploy:
+  provider: releases
+  api_key:
+    secure: CRBlLcXy8aWglVYD2YwFmZ93M6M5UktWVZKuVp0VQOMlM+/jeozis/Oai+elXR8Am9sPeRSqDRPHBk1UvQvWnZPOaHHY/9ueebqm9eofVr5oelkf1gvvVYsTyn/OyvDlkdKfb0muJpNb+DYCJRv9dgABmfJ44bumpuEQQVML4C+IcxfI76VwAvIf98UZWslnCmm0pz4QdejxD5iR2if9agEqB0pT+wd4cbRzg0627bqXZaOwerswcrbbd4+YVjfushBQCHglRvokH6cCtu5+//9KPZMLl+NCXnKclR03IdmtWXvNZ1GCtQQU6C63u0pwwYcbQ1T80WmVn6VrODrFB6aVMnGaTWcTMVamTypWTiJm6tUHP9et10jfCT1k25NcbM0j2DVSTUFiGxiYuWqMhnb504v6UDLUnMG5jBFKcNkdvr1m98KKDosT1bnDXrWoDrvz5W4dYxeP45YXxefYAEa8VOPIvLkoyUqDmI8X+K+/syOJ+jt7th+qYGgRxisPn1PinXyRWqsCABXyj3Bn0DFcUNgyvjFBxUKtnfhkoT2BBhagl9ttyOUPZP3EbRHxYIyjpE6BsUO6N+9xD8B3+zPei+zXRIbaVnfwQKrmG303MJhTdspq4Xe6fsCkbRsRPtZ7FCCc21NVpn6xpF3ABzOq0cUcS/XHR3iYEXX0s5I=
+  file_glob: true
+  file: products/*
+  skip_cleanup: true
+  on:
+    repo: blenessy/RelicBuilder
+    tags: true
