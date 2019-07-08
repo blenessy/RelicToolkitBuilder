@@ -3,11 +3,11 @@
 using BinaryBuilder
 
 name = "RelicToolkit"
-version = v"0.4.0-613-g613795f7-1"
+version = v"0.4.0-614-g0109b037-1"
 
 # Collection of sources required to build RelicToolkit
 sources = [
-    "https://github.com/blenessy/relic.git" => "613795f7481bf7806ba09bf248ab36aec599f4ab",
+    "https://github.com/blenessy/relic.git" => "0109b037cdafcc9b11cb6c566b869722fc69584f",
 ]
 
 # Bash recipe for building across all platforms
@@ -23,7 +23,8 @@ cat >build.sh <<EOF
 set -exo pipefail
 mkdir "build_\$1"
 cd "build_\$1"
-cmake -DALLOC=AUTO \
+cmake \
+  -DALLOC=AUTO \
   -DARITH=gmp \
   -DBENCH=0 \
   -DCOLOR=off \
@@ -43,6 +44,7 @@ cmake -DALLOC=AUTO \
   -DFP_QNRES="${fp_qnres:-on}" \
   -DFPX_METHD="INTEG;INTEG;LAZYR" \
   -DLABEL="\$1" \
+  -DMD_METHD=SH256 \
   -DMULTI=PTHREAD \
   -DOPSYS="${opsys:-LINUX}" \
   -DPP_EXT=LAZYR \
