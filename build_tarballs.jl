@@ -83,8 +83,9 @@ platforms = [
     #Linux(:armv7l, libc=:musl, call_abi=:eabihf),
     MacOS(:x86_64),
     #FreeBSD(:x86_64),
-    Windows(:i686),
-    Windows(:x86_64),
+    # The resulting lib is called librelic_*.dll.a need to investigate the problem
+    #Windows(:i686),
+    #Windows(:x86_64),
 ]
 #platforms = supported_platforms()
 
