@@ -3,7 +3,7 @@
 using BinaryBuilder
 
 name = "RelicToolkit"
-version = v"0.4.0-614-g0109b037-1"
+version = v"0.4.0-614-g0109b037-2"
 
 # Collection of sources required to build RelicToolkit
 sources = [
@@ -17,36 +17,36 @@ if [[ ${target} == *-apple-* ]]; then
     opsys=MACOSX
 elif [[ ${target} == *-mingw32 ]]; then
     opsys=WINDOWS
+else
+    opsys=LINUX
 fi
 cd "$WORKSPACE/srcdir/relic"
 cat >build.sh <<EOF
 set -exo pipefail
 mkdir "build_\$1"
 cd "build_\$1"
-cmake \
+cmake -DCMAKE_INSTALL_PREFIX="$prefix" -DCMAKE_TOOLCHAIN_FILE="/opt/$target/${target}_gcc.toolchain" \
   -DALLOC=AUTO \
-  -DARITH=gmp \
+  -DARITH=\$2 \
   -DBENCH=0 \
   -DCOLOR=off \
   -DCHECK=off \
   -DCMAKE_BUILD_TYPE=RELEASE \
-  -DCMAKE_INSTALL_PREFIX="$prefix" \
   -DCMAKE_POSITION_INDEPENDENT_CODE=on \
-  -DCMAKE_TOOLCHAIN_FILE="/opt/$target/${target}_gcc.toolchain" \
   -DCOMP="-O3 -funroll-loops -fomit-frame-pointer" \
   -DDOCUM=off \
   -DSEED=udev \
   -DEP_PLAIN=off \
   -DEP_SUPER=off \
-  -DFP_METHD="INTEG;INTEG;INTEG;MONTY;LOWER;SLIDE" \
+  -DFP_METHD="BASIC;COMBA;COMBA;MONTY;LOWER;SLIDE" \
   -DFP_PMERS=off \
-  -DFP_PRIME=381 \
+  -DFP_PRIME=\$3 \
   -DFP_QNRES="${fp_qnres:-on}" \
   -DFPX_METHD="INTEG;INTEG;LAZYR" \
-  -DLABEL="\$1" \
+  -DJULIA=on \
   -DMD_METHD=SH256 \
   -DMULTI=PTHREAD \
-  -DOPSYS="${opsys:-LINUX}" \
+  -DOPSYS="${opsys:-MACOSX}" \
   -DPP_EXT=LAZYR \
   -DPP_METHD="LAZYR;OATEP" \
   -DQUIET=off \
@@ -56,13 +56,18 @@ cmake \
   -DTESTS=0 \
   -DTIMER=CYCLE \
   -DVERBS=off \
-  -DWSIZE="$nbits" \
+  -DWITH="BN;DV;FP;FPX;EP;EPX;EC;PP;PC;MD" \
+  -DWSIZE="${nbits:-64}" \
   ..
 make
 make install
+mv "$prefix/lib/librelic.$dlext" "$prefix/lib/librelic_\$1.$dlext"
 EOF
-sh build.sh gmp_pbc_bls381
+sh build.sh gmp_pbc_bls381 gmp 381
+sh build.sh gmp_pbc_bn254 gmp 254
 """
+
+
 
 # These are the platforms we will build for by default, unless further
 # platforms are passed in on the command line
@@ -85,7 +90,8 @@ platforms = [
 
 # The products that we will ensure are always built
 products(prefix) = [
-    LibraryProduct(prefix, "librelic_gmp_pbc_bls381", :librelic_gmp_pbc_bls381)
+    LibraryProduct(prefix, "librelic_gmp_pbc_bls381", :librelic_gmp_pbc_bls381),
+    LibraryProduct(prefix, "librelic_gmp_pbc_bn254", :librelic_gmp_pbc_bn254),
 ]
 
 # Dependencies that must be installed before this package can be built
