@@ -8,7 +8,8 @@ All libs link to GMP because, mostly because that is already conveniently provid
 
 | Name                                | PBC       | ARITH         | OPSYS                          | ARCH  |
 | ----------------------------------- | --------- | ------------- | ------------------------------ | ----- |
-| `librelic_gmp_pbc_bls381`           | BLS12 381 | `gmp`         | `MACOSX,WINDOWS,LINUX`         | `X64` |
+| `librelic_gmp_pbc_bls381`           | BLS381    | `gmp`         | `MACOSX,LINUX`                 | `X64` |
+| `librelic_gmp_pbc_bn254`            | BN256     | `gmp`         | `MACOSX,LINUX`                 | `X64` |
 
 # Status
 
