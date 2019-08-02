@@ -3,11 +3,11 @@
 using BinaryBuilder
 
 name = "RelicToolkit"
-version = v"0.4.0-614-g0109b037-3"
+version = v"0.4.0-613-g613795f7-2"
 
 # Collection of sources required to build RelicToolkit
 sources = [
-    "https://github.com/blenessy/relic.git" => "0109b037cdafcc9b11cb6c566b869722fc69584f",
+    "https://github.com/blenessy/relic.git" => "613795f7481bf7806ba09bf248ab36aec599f4ab",
 ]
 
 # Bash recipe for building across all platforms
@@ -20,7 +20,24 @@ else
     opsys=LINUX
 fi
 cd "$WORKSPACE/srcdir/relic"
-cat >build.sh <<EOF
+
+cat >>src/relic_core.c <<EOF1
+#include "relic_bn.h"
+#include "relic_md.h"
+#include "relic_fp.h"
+#include "relic_pc.h"
+const size_t JL_RLC_BN_SIZE = RLC_BN_SIZE;
+const size_t JL_RLC_MD_LEN = RLC_MD_LEN;
+const size_t JL_BN_ST_SIZE  = sizeof(bn_st);
+const size_t JL_DIG_T_SIZE  = sizeof(dig_t);
+const size_t JL_FP_ST_SIZE  = sizeof(fp_st);
+const size_t JL_FP2_ST_SIZE = sizeof(fp2_st);
+const size_t JL_FP3_ST_SIZE = sizeof(fp3_st);
+const size_t JL_G1_ST_SIZE  = sizeof(g1_st);
+const size_t JL_G2_ST_SIZE  = sizeof(g2_st);
+EOF1
+
+cat >build.sh <<EOF2
 set -exo pipefail
 mkdir "build_\$1"
 cd "build_\$1"
@@ -43,7 +60,6 @@ cmake -DCMAKE_INSTALL_PREFIX="$prefix" -DCMAKE_TOOLCHAIN_FILE="/opt/$target/${ta
   -DFP_QNRES=on \
   -DAMALG=on \
   -DFPX_METHD="INTEG;INTEG;LAZYR" \
-  -DJULIA=on \
   -DMD_METHD=SH256 \
   -DMULTI=PTHREAD \
   -DOPSYS="${opsys:-MACOSX}" \
@@ -62,12 +78,10 @@ cmake -DCMAKE_INSTALL_PREFIX="$prefix" -DCMAKE_TOOLCHAIN_FILE="/opt/$target/${ta
 make
 make install
 mv "$prefix/lib/librelic.$dlext" "$prefix/lib/librelic_\$1.$dlext"
-EOF
+EOF2
 sh build.sh gmp_pbc_bls381 gmp 381
 sh build.sh gmp_pbc_bn254 gmp 254
 """
-
-
 
 # These are the platforms we will build for by default, unless further
 # platforms are passed in on the command line
