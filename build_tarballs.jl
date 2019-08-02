@@ -3,7 +3,7 @@
 using BinaryBuilder
 
 name = "RelicToolkit"
-version = v"0.4.0-614-g0109b037-2"
+version = v"0.4.0-614-g0109b037-3"
 
 # Collection of sources required to build RelicToolkit
 sources = [
@@ -13,7 +13,6 @@ sources = [
 # Bash recipe for building across all platforms
 script = raw"""
 if [[ ${target} == *-apple-* ]]; then
-    fp_qnres=off
     opsys=MACOSX
 elif [[ ${target} == *-mingw32 ]]; then
     opsys=WINDOWS
@@ -41,7 +40,8 @@ cmake -DCMAKE_INSTALL_PREFIX="$prefix" -DCMAKE_TOOLCHAIN_FILE="/opt/$target/${ta
   -DFP_METHD="BASIC;COMBA;COMBA;MONTY;LOWER;SLIDE" \
   -DFP_PMERS=off \
   -DFP_PRIME=\$3 \
-  -DFP_QNRES="${fp_qnres:-on}" \
+  -DFP_QNRES=on \
+  -DAMALG=on \
   -DFPX_METHD="INTEG;INTEG;LAZYR" \
   -DJULIA=on \
   -DMD_METHD=SH256 \
