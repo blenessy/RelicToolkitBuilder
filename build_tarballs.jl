@@ -3,7 +3,7 @@
 using BinaryBuilder
 
 name = "RelicToolkit"
-version = v"0.4.0-613-g613795f7-2"
+version = v"0.4.0-613-g613795f7-3"
 
 # Collection of sources required to build RelicToolkit
 sources = [
@@ -12,9 +12,9 @@ sources = [
 
 # Bash recipe for building across all platforms
 script = raw"""
-if [[ ${target} == *-apple-* ]]; then
+if [ "${target#*-apple-}" != "$target" ]; then
     opsys=MACOSX
-elif [[ ${target} == *-mingw32 ]]; then
+elif [ "${target%-mingw32}" != "$target" ]; then
     opsys=WINDOWS
 else
     opsys=LINUX
@@ -77,6 +77,11 @@ cmake -DCMAKE_INSTALL_PREFIX="$prefix" -DCMAKE_TOOLCHAIN_FILE="/opt/$target/${ta
   ..
 make
 make install
+# workaround mingw install bug
+if [ "${target%-mingw32}" != "$target" ]; then
+    rm -f "$prefix/lib/librelic.$dlext.a"
+    cp ./lib/librelic.$dlext "$prefix/lib/"
+fi
 mv "$prefix/lib/librelic.$dlext" "$prefix/lib/librelic_\$1.$dlext"
 EOF2
 sh build.sh gmp_pbc_bls381 gmp 381
@@ -98,8 +103,8 @@ platforms = [
     MacOS(:x86_64),
     #FreeBSD(:x86_64),
     # The resulting lib is called librelic_*.dll.a need to investigate the problem
-    #Windows(:i686),
-    #Windows(:x86_64),
+    Windows(:i686),
+    Windows(:x86_64),
 ]
 #platforms = supported_platforms()
 
